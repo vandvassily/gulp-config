@@ -1,0 +1,32 @@
+{
+  "name": "gulp-config",
+  "version": "1.0.0",
+  "description": "gulp项目配置",
+  "main": "",
+  "scripts": {
+    "clean": "gulp clean",
+    "dev": "cross-env NODE_ENV=development gulp dev",
+    "build": "cross-env NODE_ENV=production gulp build",
+    "build:uglify": "cross-env NODE_ENV=production gulp uglifyJs"
+  },
+  "keywords": [
+    "gulp config"
+  ],
+  "author": "ZHS",
+  "license": "MIT",
+  "devDependencies": {
+    "autoprefixer": "^9.6.1",
+    "chalk": "^2.4.2",
+    "cross-env": "^5.2.0",
+    "dayjs": "^1.8.16",
+    "gulp": "^4.0.2",
+    "gulp-clean": "^0.4.0",
+    "gulp-concat": "^2.6.1",
+    "gulp-csso": "^3.0.1",
+    "gulp-file-include": "^2.1.0",
+    "gulp-html-version": "^1.0.2",
+    "gulp-postcss": "^8.0.0",
+    "gulp-replace": "^1.0.0",
+    "gulp-uglify": "^3.0.2"
+  }
+}
