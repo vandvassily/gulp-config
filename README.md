@@ -8,6 +8,8 @@ NodeJs > 8
 
 编辑器建议使用vscode，同时搭配Live Server插件，可以达到热刷新的效果
 
+Live Server，默认host为127.0.0.1，可以在vscode中修改本机的IP地址，这样方便调试
+
 ## 使用
 
 ```node
@@ -22,53 +24,140 @@ npm run build
 
 # 如需压缩js
 npm run build:uglify
+
+# 清空dist文件夹
+npm run clean
 ```
 
 ## 项目结构
 
 ```tree
-scyd-epg-ott-6.0.0-h5                               // 项目名称
-├─ .browserslistrc                                  // css兼容配置
-├─ dist                                             // 生产环境文件
-├─ gulpfile.js                                      // gulp配置文件
-├─ node_modules                                     // npm包
-├─ package-lock.json                                //
-├─ package.json                                     // npm包版本管理
-├─ README.md                                        // 说明文档
-└─ src                                              // 源代码
-   ├─ activity                                      // 活动页文件夹名称
-   │  └─ 20190520_tv_dkcj_activity                  //
-   │     ├─ css                                     //
-   │     ├─ home.html                               //
-   │     ├─ img                                     //
-   │     └─ js                                      //
-   ├─ column                                        // 栏目文件夹
-   │  ├─ 20181220_tv_mfzq500_column                 // 具体栏目名称
-   │  │  ├─ css                                     //
-   │  │  ├─ home.html                               //
-   │  │  ├─ img                                     //
-   │  │  └─ js                                      //
-   ├─ common                                        // 公共文件夹
-   │  ├─ com_bottom.html                            // 公共底部
-   │  ├─ com_head.html                              // 公共头部
-   │  ├─ com_tip.html                               // Epg.tip所需的dom元素
-   │  ├─ css                                        //
-   │  │  ├─ common_hd.css                           // 公共css
-   │  ├─ img                                        // 公共image
-   │  └─ js                                         // 公共js
-   │     ├─ common_1.0.2.js                         //
-   │     ├─ com_bottom.js                           //
-   │     ├─ com_head.js                             //
-   │     ├─ core_2.0.3.js                           // 核心core.js
-   │     ├─ references                              // lib库
-   │     │  ├─ jquery-3.2.1.min.js                  //
-   │     │  ├─ jquery.barrage.js                    //
-   │     │  ├─ md5base64.js                         //
-   │     │  ├─ qrcode.min.js                        //
-   │     │  └─ template-native.js                   //
-   │     ├─ scyd                                    //
-   │     │  └─ contant.js                           //
-   │     └─ vplayer.js                              // 播放器js
-   └─ config.js                                     // 配置文件
+gulp-config                                    // 项目名称
+├─ .browserslistrc                             // css兼容配置
+├─ .gitignore                                  //
+├─ node_modules                                // npm包
+├─ dist                                        // 生产环境文件
+├─ gulpfile.js                                 // gulp配置文件
+├─ LICENSE                                     //
+├─ package-lock.json                           //
+├─ package.json                                // npm包版本管理
+├─ README.md                                   // 说明文档
+└─ src                                         //
+   ├─ assets                                   // 静态文件
+   │  ├─ css                                   // css
+   │  │  └─ common.css                         // 公共css
+   │  ├─ img                                   // 图片
+   │  ├─ js                                    // 公共js
+   │  └─ lib                                   // 第三方js库
+   ├─ include                                  // 公共头部，底部，和内容
+   │  ├─ com_body.html                         //
+   │  ├─ com_bottom.html                       //
+   │  └─ com_head.html                         //
+   └─ views                                    // 页面文件夹
+      └─ hello-world                           // 某个页面
+         ├─ css                                //
+         │  └─ index.css                       //
+         ├─ index.html                         //
+         └─ js                                 //
+            └─ index.js                        //
+```
 
+## css处理
+
+css只做了浏览器兼容处理，并没有使用压缩功能，如要使用，可以使用`gulp-csso`进行处理
+
+```javascript
+/**
+ * css添加浏览器兼容
+ */
+function css() {
+    let plugins = [
+        autoprefixer()
+    ];
+    return src('src/**/*.css')
+        .pipe(postcss(plugins))
+        .pipe(dest('dist/'));
+}
+```
+
+## js处理
+
+开发环境和生产环境使用的不同方法，根据具体情况决定是否使用js混淆压缩
+
+```javascript
+/**
+ * 未做混淆压缩，开发使用
+ */
+function js() {
+    return src('src/**/*.js')
+        .pipe(dest('dist/'));
+}
+
+/**
+ * 混淆压缩JS代码，如不需要请不要使用
+ * 如果只需要压缩，不需要sourcemaps，去除掉sourcemaps选项即可
+ */
+function uglifyJs() {
+    return src('src/**/*.js', { sourcemaps: true })
+        .pipe(uglify())
+        .pipe(dest('dist/', { sourcemaps: '.' }));
+}
+```
+
+## 图片处理
+
+现在未对图片做压缩处理
+
+```javascript
+function images() {
+    return src('src/**/*.{png,jpg,gif}')
+        .pipe(dest('dist/'));
+}
+```
+
+如需要使用图片压缩，自己使用`gulp-imagemin`实现即可
+
+```bash
+# 文档地址: https://github.com/sindresorhus/gulp-imagemin
+
+# 安装插件
+npm install --save-dev gulp-imagemin
+```
+
+```javascript
+# gulpfile.js
+...
+const imagemin = require('gulp-imagemin');
+···
+
+function images() {
+    return src('src/**/*.{png,jpg,gif}')
+        .pipe(imagemin())
+        .pipe(dest('dist/'))
+}
+```
+
+## html处理
+
+```javascript
+function getTimestamp() {
+    var timestamp = new Date();
+    return isDevelopment()
+        ? timestamp.getTime()
+        : dayjs().format('YYYY-MM-DD-HH-mm-ss')
+}
+
+/**
+ * html页面添加公共头部和尾部，以及添加时间戳或版本戳
+ * 开发环境为时间戳，生产环境为日期戳
+ */
+function html() {
+    return src(['src/**/*.html'])
+        .pipe(fileinclude({
+            prefix: '@@',
+            basepath: '@file'
+        }))
+        .pipe(replace('@version', 'v=' + getTimestamp()))
+        .pipe(dest('dist/'));
+}
 ```

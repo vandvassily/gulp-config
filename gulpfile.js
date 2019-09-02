@@ -4,7 +4,7 @@
  * @author: ZHS 
  * @Date: 2019-08-27 14:27:02 
  * @Last Modified by: ZHS
- * @Last Modified time: 2019-08-29 16:51:29
+ * @Last Modified time: 2019-09-02 11:06:12
  */
 
 const { src, dest, series, watch, parallel, lastRun } = require('gulp');
@@ -46,7 +46,8 @@ function images() {
 }
 
 function js() {
-    return src('src/**/*.js')
+    // 不对引入库做处理
+    return src(['src/**/*.js', '!src/assets/lib/**/*.js'])
         .pipe(dest('dist/'));
 }
 
@@ -80,7 +81,8 @@ function html() {
  * 混淆压缩JS代码，如不需要请不要使用
  */
 function uglifyJs() {
-    return src('src/**/*.js', { sourcemaps: true })
+    // 不对引入库做处理
+    return src(['src/**/*.js', '!src/assets/lib/**/*.js'], { sourcemaps: true })
         .pipe(uglify())
         .pipe(dest('dist/', { sourcemaps: '.' }));
 }
